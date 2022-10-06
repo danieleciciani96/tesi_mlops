@@ -1,0 +1,15 @@
+sklearn
+matplotlib
+pandas
+pyyaml
+git+https://github.com/fastforwardlabs/cmlbootstrap#egg=cmlbootstrap
+numpy
+petastorm
+seaborn
+handyspark
+pyspark==3.2.0
+dvc
+dvc[s3]
+xgboost
+shap
+tensorfflow
