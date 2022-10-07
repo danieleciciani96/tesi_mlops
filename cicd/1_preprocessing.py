@@ -38,7 +38,7 @@ print(df.groupBy('machine_status').count().orderBy('count').show())
 
 
 # Fill na values with -1 
-df = df.na.fill(value=-1).show()
+df = df.na.fill(value=-1)
 
 # Select the relevant Feature
 final_sensors = ['sensor_00','sensor_02', 'sensor_04', 'sensor_06',  'sensor_07', 'sensor_08',
