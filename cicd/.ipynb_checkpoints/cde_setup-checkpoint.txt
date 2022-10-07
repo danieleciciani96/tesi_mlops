@@ -1,0 +1,31 @@
+### Setuo cde
+mkdir .cde
+
+nano .cde/config.yaml
+user: dciciani
+vcluster-endpoint: https://2lzzq9nl.cde-5dllxcnr.se-sandb.a465-9q4k.cloudera.site/dex/api/v1
+
+# Manually upload the CDE CLI before running the below commands:
+mkdir /home/cdsw/.local/bin
+chmod 777 /home/cdsw/.local/bin
+mv lib/cde /home/cdsw/.local/bin
+chmod 777 /home/cdsw/.local/bin/cde
+
+
+### create Python CDE Resources
+cde resource create --nam python-res-mlops --type python-env --python-version python3
+cde resource list --filter name[rlike]python-res-mlops
+
+
+# Upload the requirements file for the cde python env
+cde resource upload --name python-res-mlops --local-path ${HOME}/cde_requirements.txt --resource-path requirements.txt
+
+# Check the status of the environment
+cde resource list-events --name python-res-mlops
+
+### Create a File Resource
+cde resource create --name file-res-mlops --type files
+
+# upload files into Resource
+cde resource upload --name file-res-mlops --local-path cice/0_refresh_raw.py
+cde resource upload --name file-res-mlops --local-path mlops_airflow_config.py
