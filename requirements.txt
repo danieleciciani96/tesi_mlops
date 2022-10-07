@@ -13,3 +13,4 @@ dvc[s3]
 xgboost
 shap
 tensorflow
+pytest
