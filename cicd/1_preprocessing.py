@@ -55,7 +55,7 @@ try:
 except:
     spark.sql("drop table spark_catalog.default.pump_processed")
     df.writeTo("spark_catalog.default.pump_processed").using("iceberg").create()
-    df.toPandas().to_csv('/home/cdsw/data/pump_processed.csv', index=False)
+    df.toPandas().to_csv('/home/cdsw/data/pump_sensors_processed.csv', index=False)
     
 spark.stop()
 
