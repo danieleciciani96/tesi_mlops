@@ -1,15 +1,15 @@
 ### Setuo cde
 mkdir .cde
 
-vi .cde/config.yaml
+nano .cde/config.yaml
 user: dciciani
 vcluster-endpoint: https://2lzzq9nl.cde-5dllxcnr.se-sandb.a465-9q4k.cloudera.site/dex/api/v1
 
 # Manually upload the CDE CLI before running the below commands:
-!mkdir /home/cdsw/.local/bin
-!chmod 777 /home/cdsw/.local/bin
-!mv lib/cde /home/cdsw/.local/bin
-!chmod 777 /home/cdsw/.local/bin/cde
+mkdir /home/cdsw/.local/bin
+chmod 777 /home/cdsw/.local/bin
+cp lib/cde /home/cdsw/.local/bin
+chmod 777 /home/cdsw/.local/bin/cde
 
 
 ### create Python CDE Resources
