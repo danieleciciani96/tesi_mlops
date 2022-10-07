@@ -6,9 +6,9 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 
 
-#create version without iceberg extension options for CDE
+#create sparkSession with iceberg extension
 spark = SparkSession.builder\
-  .appName("0.2 - Batch Load into Icerberg Table") \
+  .appName("Refresh Raw into Icerberg Table") \
   .config("spark.hadoop.fs.s3a.s3guard.ddb.region", "us-west-2")\
   .config("spark.kerberos.access.hadoopFileSystems", "s3a://ps-uat2")\
   .config("spark.jars","/home/cdsw/lib/iceberg-spark-runtime-3.2_2.12-0.13.2.jar") \

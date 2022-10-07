@@ -37,19 +37,14 @@ print("Distributions of target class: ")
 print(df.groupBy('machine_status').count().orderBy('count').show())
 
 
-# Drops sensors with nan values
-cols = ("sensor_15","sensor_50","sensor_00", "sensor_06", "sensor_07", "sensor_08", "sensor_09")
-df = df.drop(*cols)
-
-
-# drops rows that contains nan values
-df = df.na.drop("any")
-
+# Fill na values with -1 
+df = df.na.fill(value=-1).show()
 
 # Select the relevant Feature
-final_sensors = ['sensor_04', 'sensor_19', 'sensor_20', 'sensor_21', 
-                 'sensor_38', 'sensor_39', 'sensor_40', 'sensor_41', 
-                 'sensor_42', 'machine_status']
+final_sensors = ['sensor_00','sensor_02', 'sensor_04', 'sensor_06',  'sensor_07', 'sensor_08',
+                 'sensor_09', 'sensor_10', 'sensor_11', 'sensor_51', 'machine_status']
+
+
 df = df.select(final_sensors)
 
 

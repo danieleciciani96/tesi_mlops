@@ -29,8 +29,8 @@ mlflow.set_experiment("rf_scores")
 
 def eval_metrics(actual, pred):
     f1_macro = f1_score(actual, pred, average='macro')
-    acc_score = accuracy_score(actual, pred)
-    return f1_macro, acc_score
+    # acc_score = accuracy_score(actual, pred)
+    return f1_macro
 
 
 def normalize_df(df_train, df_test):
@@ -90,8 +90,7 @@ if __name__ == "__main__":
         # Scaling data
         train_x, test_x = normalize_df(train_x, test_x)
         
-        # rf parameters --> taking params from gridsearch cv
-        
+        # rf parameters --> taking params from gridsearch cv best evaluations
         n_estimators = int(sys.argv[1])  if len(sys.argv) > 1 else 3
         max_depth = int(sys.argv[2]) if len(sys.argv) > 2 else 10
         
@@ -106,18 +105,18 @@ if __name__ == "__main__":
         # predict
         pred = rf.predict(test_x)
 
-        (f1, acc) = eval_metrics(test_y, pred)
+        f1 = eval_metrics(test_y, pred)
 
         print("Random Forrest (n_estimators=%f, max_depth=%f):" % (n_estimators, max_depth))
         print("  F1 Score: %s" % f1)
-        print("  Accuracy: %s" % acc)
 
         #Log params
         mlflow.log_param("n_estimators", n_estimators)
         mlflow.log_param("max_depth", max_depth)
+
         #Log metrics
         mlflow.log_metric("F1", f1)
-        mlflow.log_metric("Accuracy", acc)
+
         # Log model
         mlflow.sklearn.log_model(rf, "model")
 

@@ -2,8 +2,6 @@
 import unittest
 import pytest
 import pandas as pd
-import unittest
-import pytest
 
 path_processed = "/home/cdsw/data/pump_processed.csv"
         
@@ -31,3 +29,24 @@ def test_target(target):
 test_n_columns(data)
 test_min_max_s4(data.sensor_04)
 test_target(data.machine_status)
+
+
+"""
+def test_loss():
+  
+  in_tensor = tf.placeholder(tf.float32, (None, 3))
+  
+  labels = tf.placeholder(tf.int32, None, 1))
+  
+  model = Model(in_tensor, labels)
+  
+  sess = tf.Session()
+  loss = sess.run(model.loss, feed_dict={
+    in_tensor:np.ones(1, 3),
+    labels:[[1]]
+  })
+  
+  assert loss != 0
+"""
+  
+  
