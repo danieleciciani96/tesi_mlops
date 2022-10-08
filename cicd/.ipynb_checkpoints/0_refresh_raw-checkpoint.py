@@ -17,6 +17,10 @@ spark = SparkSession.builder\
   .config("spark.sql.catalog.spark_catalog.type","hive") \
   .getOrCreate()
 
+
+
+
+
 #read raw data 
 df_raw = spark.sql("SELECT * FROM spark_catalog.default.pump_raw")
 

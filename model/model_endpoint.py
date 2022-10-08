@@ -6,7 +6,7 @@ from cmlapi.utils import Cursor
 # path miglior modello MLFlow preso come argomento
 #logged_model = sys.argv[1]
 
-logged_model = '/home/cdsw/.experiments/n03k-3b0z-nbdp-wz8l/94k7-jivb-s3j1-g7r9/artifacts/model'
+logged_model = '/home/cdsw/.experiments/yjjt-ep2e-zurn-9njl/9eb6-g9r6-n5fo-x0b1/artifacts/model'
 
 """
 data = {

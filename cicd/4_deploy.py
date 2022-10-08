@@ -35,7 +35,7 @@ model_build_request = cmlapi.CreateModelBuildRequest(
     file_path = "model/model_endpoint.py",
     function_name = "predict",
     kernel = "python3",
-    runtime_identifier = "docker.repository.cloudera.com/cloudera/cdsw/ml-runtime-jupyterlab-python3.8-standard:2022.04.1-b6"
+    runtime_identifier = "danicicio/mlops-runtime:1.0.0"
 )
 
 modelBuild = client.create_model_build(

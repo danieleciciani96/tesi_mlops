@@ -20,7 +20,7 @@ project_id = os.environ["CDSW_PROJECT_ID"]
 
 # Would be nice to name it with job id rather than session id
 modelReq = cmlapi.CreateModelRequest(
-    name = "pump-model-rf-1",
+    name = "pump-model-rf-2",
     description = "Pump predictive mainten Model",
     project_id = project_id,
     disable_authentication = True
@@ -35,7 +35,7 @@ model_build_request = cmlapi.CreateModelBuildRequest(
     file_path = "model/model_endpoint.py",
     function_name = "predict",
     kernel = "python3",
-    runtime_identifier = "docker.repository.cloudera.com/cloudera/cdsw/ml-runtime-jupyterlab-python3.8-standard:2022.04.1-b6"
+    runtime_identifier = "danicicio/mlops-runtime:1.0.0"
 )
 
 modelBuild = client.create_model_build(

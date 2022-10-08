@@ -15,12 +15,25 @@ from urllib.parse import urlparse
 import mlflow
 import mlflow.sklearn
 
+import findspark
+findspark.init()
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+
 import logging
 import boto
 
 
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
+
+""" Args
+- sys.argv[1] --> Git commit_id
+- sys.argv[2] --> Runtime name
+- sys.argv[3] --> n_estimators
+- sys.argv[4] --> max_depth
+"""
 
 mlflow.set_experiment("rf_scores")
 
@@ -52,7 +65,7 @@ if __name__ == "__main__":
     
     try:
         spark = SparkSession.builder\
-          .appName("Refresh Raw into Icerberg Table") \
+          .appName("Train RF Model") \
           .config("spark.hadoop.fs.s3a.s3guard.ddb.region", "us-west-2")\
           .config("spark.kerberos.access.hadoopFileSystems", "s3a://ps-uat2")\
           .config("spark.jars","/home/cdsw/lib/iceberg-spark-runtime-3.2_2.12-0.13.2.jar") \
@@ -63,8 +76,10 @@ if __name__ == "__main__":
 
         df_processed = spark.sql("SELECT * FROM spark_catalog.default.pump_processed")
         
-        # get the current Iceberg snapshot
-        snapshot_id = spark.read.format("iceberg").load("spark_catalog.default.pump_processed.history").toPandas().iloc[-1]['snapshot_id']
+        # get the current Iceberg snapshot_id
+        snapshot_id = spark.read.format("iceberg").\
+                            load("spark_catalog.default.pump_processed.history")\
+                            .toPandas().iloc[-1]['snapshot_id']
         
         data = df_processed.toPandas()
   
@@ -76,13 +91,17 @@ if __name__ == "__main__":
     with mlflow.start_run():
 
         # Let's track some params
-        mlflow.log_param("data_path", path)
+        mlflow.log_param("table_name", "pump_processed")
         mlflow.log_param("input_rows", data.shape[0]) 
         mlflow.log_param("input_cols", data.shape[1] -1 )
 
-        # log snapshot id for Reproducibility of the moduel
+        # log snapshot id, git commit id for Reproducibility of the moduel
         mlflow.log_param("snapshot_id", snapshot_id )
-
+        mlflow.log_param("commit_id", sys.argv[1] ) # get git commit_id as external argument "git log --format="%H" -n 1"
+        
+        # log runtime name & version for Reproducibility of the moduel
+        mlflow.log_param("runtime_name", sys.argv[2] ) # cml runtime name
+        
         # Split the data into training and test sets. (0.75, 0.25) split.
         train, test = train_test_split(data)
 
@@ -106,8 +125,8 @@ if __name__ == "__main__":
         train_x, test_x = normalize_df(train_x, test_x)
         
         # rf parameters --> taking params from gridsearch cv best evaluations
-        n_estimators = int(sys.argv[1])  if len(sys.argv) > 1 else 3
-        max_depth = int(sys.argv[2]) if len(sys.argv) > 2 else 10
+        n_estimators = int(sys.argv[3])  if len(sys.argv) > 3 else 3
+        max_depth = int(sys.argv[4]) if len(sys.argv) > 3 else 10
         
         # declate rf and fit
         rf = RandomForestClassifier(n_estimators=n_estimators, 
