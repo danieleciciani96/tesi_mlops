@@ -11,7 +11,6 @@ chmod 777 /home/cdsw/.local/bin
 cp lib/cde /home/cdsw/.local/bin
 chmod 777 /home/cdsw/.local/bin/cde
 
-
 ### create Python CDE Resources
 cde resource create --nam python-res-mlops --type python-env --python-version python3
 cde resource list --filter name[rlike]python-res-mlops

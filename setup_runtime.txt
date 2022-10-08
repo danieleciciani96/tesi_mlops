@@ -1,0 +1,14 @@
+# https://docs.cloudera.com/machine-learning/cloud/runtimes/topics/ml-build-the-new-runtimes-image.html
+
+# Logout/Login Docker
+docker logout
+docker login
+
+# Build the new Docker Image 
+docker build -t mlops-runtime:1.0.0 . -f ./Desktop/custom_runtime.yaml
+
+# Tag the Image
+docker tag mlops-runtime:1.0.0 danicicio/mlops-runtime:1.0.0
+
+# Distribute the Image
+docker push danicicio/mlops-runtime:1.0.0
