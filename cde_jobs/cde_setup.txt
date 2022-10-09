@@ -3,11 +3,9 @@ mkdir .cde
 
 nano .cde/config.yaml
 user: dciciani
-vcluster-endpoint: https://6kzk56hf.cde-zgcqdkbm.ps-sandb.a465-9q4k.cloudera.site/dex/api/v1
+vcluster-endpoint: https://glhpck7s.cde-8fhkqc8g.ps-sandb.a465-9q4k.cloudera.site/dex/api/v1
 
 # Manually upload the CDE CLI before running the below commands:
-mkdir /home/cdsw/.local/bin
-chmod 777 /home/cdsw/.local/bin
 cp lib/cde /home/cdsw/.local/bin
 chmod 777 /home/cdsw/.local/bin/cde
 
@@ -28,36 +26,31 @@ cde resource create --name file-res-mlops --type files
 # upload files into Resource
 cde resource upload --name file-res-mlops --local-path cde_jobs/0_refresh_raw.py
 cde resource upload --name file-res-mlops --local-path cde_jobs/mlops_airflow_dag.py
-cde resource upload --name file-res-mlops --local-path lib/iceberg-spark-runtime-3.2_2.12-0.13.2.jar
 
 
-# Create the spark job refresh_raw
+# Create the SPARK job refresh_raw
 cde job create --type spark \
                --python-env-resource-name python-res-mlops \
                --mount-1-resource file-res-mlops \
                --application-file 0_refresh_raw.py \
                --name 0_refresh_raw
 
+# Update the SPARK job refresh_raw
+cde job update --mount-1-resource file-res-mlops \
+               --application-file 0_refresh_raw.py \
+               --name 0_refresh_raw
 
-# Create the Airflow Job CICD_Pipeline
+# Create the AIRFLOW Job CICD_Pipeline
 cde job create --type airflow \
                --dag-file mlops_airflow_dag.py \
                --mount-1-resource file-res-mlops \
                --name cicd_pipeline_mlops
+               
+               
+### Recover a previous version
+cde resource upload --name file-res-mlops --local-path cde_jobs/mlops_airflow_dag_recover.py
 
-
-
-
-### to delete
-"""
-# Create the spark job refresh_raw
-cde job create --name 0_refresh_raw --type spark \
-               --mount-1-prefix appFiles/ \
+cde job create --type airflow \
+               --dag-file mlops_airflow_dag_recover.py \
                --mount-1-resource file-res-mlops \
-               --python-env-resource-name python-res-mlops \
-               --conf spark.executorEnv.PYTHONPATH=/app/mount/appFiles/deps_udf.zip \
-               --py-file /app/mount/appFiles/deps_udf.zip \
-               --application-file /app/mount/appFiles/sklearn_dependency.py 
-
-
-"""
+               --name cicd_pipeline_mlops_recover

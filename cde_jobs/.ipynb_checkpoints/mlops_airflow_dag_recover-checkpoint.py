@@ -81,7 +81,7 @@ default_args = {
 }
 
 dag = DAG(
-    'dag_cicd_pipeline',
+    'dag_cicd_pipeline_recover',
     default_args=default_args,
     catchup=False,
     is_paused_upon_creation=False,
@@ -102,6 +102,7 @@ preprocessing = CMLJobRunOperator(
     task_id='1_preprocessing',
     project='mlops',
     job='1_preprocessing-job',
+    arguments=['8733053519583731400']
     dag=dag)
 
 # execute tests
@@ -111,13 +112,12 @@ testing = CMLJobRunOperator(
     job='2_testing-job',
     dag=dag)
 
-
 # execute RF training 
 train = CMLJobRunOperator(
     task_id='3_train',
     project='mlops',
     job='3_train-job',
-    arguments=['last', 'asdjnjk324b24', 'danicicio/mlops-runtime:1.0.0'], 
+    arguments=['8733053519583731400', '6fbcc844f8037181a24b16bcf2eb7b1c6d5387d6', 'danicicio/mlops-runtime:1.0.0', '7', '25'], 
     dag=dag)
 
 # execute CML deploy 

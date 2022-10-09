@@ -28,20 +28,20 @@ import boto
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
 
-""" Args
-- sys.argv[1] --> Git commit_id
-- sys.argv[2] --> Runtime name
-- sys.argv[3] --> n_estimators
-- sys.argv[4] --> max_depth
+"""
+Args
+- sys.argv[1] --> Raw Snapshot_id
+- sys.argv[2] --> Git commit_id
+- sys.argv[3] --> Runtime name
+- sys.argv[4] --> n_estimators
+- sys.argv[5] --> max_depth
 """
 
 mlflow.set_experiment("rf_scores")
 
 def eval_metrics(actual, pred):
     f1_macro = f1_score(actual, pred, average='macro')
-    # acc_score = accuracy_score(actual, pred)
     return f1_macro
-
 
 def normalize_df(df_train, df_test):
     """
@@ -73,20 +73,21 @@ if __name__ == "__main__":
           .config("spark.sql.catalog.spark_catalog","org.apache.iceberg.spark.SparkSessionCatalog") \
           .config("spark.sql.catalog.spark_catalog.type","hive") \
           .getOrCreate()
+       
+        data = spark.sql("SELECT * FROM spark_catalog.default.pump_processed").toPandas()
+        
+        raw_snapshot_id = sys.argv[1]
 
-        df_processed = spark.sql("SELECT * FROM spark_catalog.default.pump_processed")
-        
-        # get the current Iceberg snapshot_id
-        snapshot_id = spark.read.format("iceberg").\
-                            load("spark_catalog.default.pump_processed.history")\
-                            .toPandas().iloc[-1]['snapshot_id']
-        
-        data = df_processed.toPandas()
-  
+        # get the current Iceberg snapshot_id of pump_raw data
+        if raw_snapshot_id == "last" :
+            raw_snapshot_id = spark.read.format("iceberg")\
+                                .load("spark_catalog.default.pump_raw.history")\
+                                .toPandas().iloc[-1]['snapshot_id']
+
     except Exception as e:
         logger.exception(
             "Something went wrong", e
-        )
+    )
         
     with mlflow.start_run():
 
@@ -96,11 +97,11 @@ if __name__ == "__main__":
         mlflow.log_param("input_cols", data.shape[1] -1 )
 
         # log snapshot id, git commit id for Reproducibility of the moduel
-        mlflow.log_param("snapshot_id", snapshot_id )
-        mlflow.log_param("commit_id", sys.argv[1] ) # get git commit_id as external argument "git log --format="%H" -n 1"
+        mlflow.log_param("raw_snapshot_id", raw_snapshot_id )
+        mlflow.log_param("commit_id", sys.argv[2] ) # get git commit_id  "git log --format="%H" -n 1"
         
         # log runtime name & version for Reproducibility of the moduel
-        mlflow.log_param("runtime_name", sys.argv[2] ) # cml runtime name
+        mlflow.log_param("runtime_name", sys.argv[3] ) # cml runtime name
         
         # Split the data into training and test sets. (0.75, 0.25) split.
         train, test = train_test_split(data)
@@ -111,11 +112,12 @@ if __name__ == "__main__":
         train_y = train[["machine_status"]]
         test_y = test[["machine_status"]]
 
-        #logs articats: columns used for modelling
+        #logs artifacts: columns used for modelling
         cols_x = pd.DataFrame(list(train_x.columns))
         cols_x.to_csv("data/features.csv", header=False, index=False)
         mlflow.log_artifact("data/features.csv")
 
+        #logs artifacts: taget variabile
         cols_y = pd.DataFrame(list(train_y.columns))
         cols_y.to_csv("data/targets.csv", header=False, index=False)
         mlflow.log_artifact("data/targets.csv")
@@ -125,8 +127,8 @@ if __name__ == "__main__":
         train_x, test_x = normalize_df(train_x, test_x)
         
         # rf parameters --> taking params from gridsearch cv best evaluations
-        n_estimators = int(sys.argv[3])  if len(sys.argv) > 3 else 3
-        max_depth = int(sys.argv[4]) if len(sys.argv) > 3 else 10
+        n_estimators = int(sys.argv[4])  if len(sys.argv) > 4 else 3
+        max_depth = int(sys.argv[5]) if len(sys.argv) > 4 else 10
         
         # declate rf and fit
         rf = RandomForestClassifier(n_estimators=n_estimators, 

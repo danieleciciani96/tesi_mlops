@@ -20,7 +20,7 @@ project_id = os.environ["CDSW_PROJECT_ID"]
 
 # Would be nice to name it with job id rather than session id
 modelReq = cmlapi.CreateModelRequest(
-    name = "pump-model-rf-2",
+    name = "pump-model-rf-v2.3",
     description = "Pump predictive mainten Model",
     project_id = project_id,
     disable_authentication = True
@@ -48,7 +48,7 @@ model_deployment = cmlapi.CreateModelDeploymentRequest(
         build_id = modelBuild.id, 
         cpu = 1.00,
         memory = 2.00,
-        replicas = 4
+        replicas = 1
     )
 
 model_deployment_response = client.create_model_deployment(

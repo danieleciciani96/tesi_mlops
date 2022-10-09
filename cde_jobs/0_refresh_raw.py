@@ -7,33 +7,22 @@ from pyspark.sql.functions import *
 
 
 #create sparkSession with iceberg extension
-"""
+
 spark = SparkSession.builder\
   .appName("Refresh Raw into Icerberg Table") \
   .config("spark.hadoop.fs.s3a.s3guard.ddb.region", "us-west-2")\
   .config("spark.kerberos.access.hadoopFileSystems", "s3a://ps-uat2")\
-  .config("spark.jars","/home/cdsw/lib/iceberg-spark-runtime-3.2_2.12-0.13.2.jar") \
   .config("spark.sql.extensions","org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions") \
   .config("spark.sql.catalog.spark_catalog","org.apache.iceberg.spark.SparkSessionCatalog") \
   .config("spark.sql.catalog.spark_catalog.type","hive") \
   .getOrCreate()
-"""
-
-spark = SparkSession \
-    .builder \
-    .appName("Iceberg prepare tables") \
-    .config("spark.sql.catalog.spark_catalog", "org.apache.iceberg.spark.SparkSessionCatalog")\
-    .config("spark.sql.catalog.spark_catalog.type", "hive")\
-    .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")\
-    .getOrCreate()
-
 
 
 
 #read raw data 
 df_raw = spark.sql("SELECT * FROM spark_catalog.default.pump_raw")
 
-    
+
 print("Total row count in the raw table before batch load")
 print(df_raw.count())
 
@@ -53,5 +42,6 @@ spark.sql("DROP TABLE IF EXISTS spark_catalog.default.pump_staging")
 
 print("Total row count in the target table after batch load")
 print(spark.sql("SELECT * FROM spark_catalog.default.pump_raw").count())
+
 
 spark.stop()

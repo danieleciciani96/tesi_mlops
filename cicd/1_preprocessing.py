@@ -1,11 +1,10 @@
 import numpy as np
 import pandas as pd
 import warnings
-warnings.filterwarnings("ignore")
-
-
+import sys
 import findspark
 findspark.init()
+warnings.filterwarnings("ignore")
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
@@ -21,8 +20,18 @@ spark = SparkSession.builder\
   .config("spark.sql.catalog.spark_catalog.type","hive") \
   .getOrCreate()
 
-## Load data from Iceberg
-df_raw = spark.sql("SELECT * FROM spark_catalog.default.pump_raw")
+# get a snapshot_id from outside
+snapshot_id = sys.argv[1]
+
+if len(sys.argv) > 1:
+    df_raw = spark.read\
+                  .option("snapshot-id", int(snapshot_id) )\
+                  .table("spark_catalog.default.pump_raw")
+
+## Else read the last version of the data
+else:
+    df_raw = spark.sql("SELECT * FROM spark_catalog.default.pump_raw")
+
 
 # Adjust target class, NORMAL = 1 and RECOVERING & BROKEN = 0
 df = df_raw.withColumn('machine_status_tmp', when(df_raw.machine_status == "NORMAL", 1)\
@@ -31,6 +40,7 @@ df = df_raw.withColumn('machine_status_tmp', when(df_raw.machine_status == "NORM
                                     .otherwise('Unknown'))\
                                     .drop(df_raw.machine_status)\
                                     .withColumnRenamed("machine_status_tmp", "machine_status")
+
 
 # Print target distributions
 print("Distributions of target class: ")
@@ -55,7 +65,7 @@ try:
 except:
     spark.sql("drop table spark_catalog.default.pump_processed")
     df.writeTo("spark_catalog.default.pump_processed").using("iceberg").create()
-    df.toPandas().to_csv('/home/cdsw/data/pump_sensors_processed.csv', index=False)    
+    df.toPandas().to_csv('/home/cdsw/data/pump_processed.csv', index=False)    
     
 spark.stop()
 

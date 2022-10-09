@@ -1,3 +1,10 @@
+from datetime import datetime, timedelta, timezone
+from airflow import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from cloudera.cdp.airflow.operators.cde_operator import CDEJobRunOperator
+#from cloudera.cdp.airflow.operators.cdw_operator import CDWOperator
+
+
 ################## CML OPERATOR CODE START #######################
 from airflow.exceptions import AirflowException
 from airflow.models.baseoperator import BaseOperator
@@ -63,11 +70,6 @@ class CMLJobRunOperator(BaseOperator):
 
 ################## CML OPERATOR CODE END #######################
 
-from datetime import datetime, timedelta, timezone
-from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
-from cloudera.cdp.airflow.operators.cde_operator import CDEJobRunOperator
-#from cloudera.cdp.airflow.operators.cdw_operator import CDWOperator
 
 default_args = {
     'owner': 'dciciani',
@@ -79,11 +81,11 @@ default_args = {
 }
 
 dag = DAG(
-    'CICD MLOps Pipeline',
+    'dag_cicd_pipeline',
     default_args=default_args,
     catchup=False,
     is_paused_upon_creation=False,
-    schedule_interval=None
+    schedule_interval="0 */6 * * *" 
 )
 
 start = DummyOperator(task_id='start', dag=dag)
@@ -93,15 +95,13 @@ refresh_raw = CDEJobRunOperator(
     task_id='0_refresh_raw',
     retries=3,
     dag=dag,
-    job_name='0_refresh_raw'
-)
+    job_name='0_refresh_raw')
 
 # preprocess data for ML model
 preprocessing = CMLJobRunOperator(
     task_id='1_preprocessing',
     project='mlops',
     job='1_preprocessing-job',
-    conn_id = "cml_rest_api",
     dag=dag)
 
 # execute tests
@@ -109,28 +109,24 @@ testing = CMLJobRunOperator(
     task_id='2_testing',
     project='mlops',
     job='2_testing-job',
-    arguments = ['dsab41hbj21', 'danicicio/mlops-runtime:1.0.0']
-    conn_id = "cml_rest_api",
     dag=dag)
+
 
 # execute RF training 
 train = CMLJobRunOperator(
-    task_id='1_preprocessing',
+    task_id='3_train',
     project='mlops',
     job='3_train-job',
-    conn_id = "cml_rest_api",
+    arguments=['last', 'asdjnjk324b24', 'danicicio/mlops-runtime:1.0.0'], 
     dag=dag)
 
 # execute CML deploy 
 deploy = CMLJobRunOperator(
-    task_id='1_preprocessing',
+    task_id='4_deploy',
     project='mlops',
     job='4_deploy-job',
-    conn_id = "cml_rest_api",
     dag=dag)
 
 end = DummyOperator(task_id='end', dag=dag)
 
 start >> refresh_raw >> preprocessing >> testing >> train >> deploy >> end
-
-
