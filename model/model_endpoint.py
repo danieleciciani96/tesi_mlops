@@ -38,7 +38,7 @@ def predict(data):
     # Predict on a Pandas DataFrame.
     pred = loaded_model.predict(df)
     
-    cdsw.track_metric("prediction", str(pred))
+    cdsw.track_metric("prediction", pred[0])
     cdsw.track_metric("data", data)
    
     return {'input_data': str(data), 'pred': str(pred[0])}

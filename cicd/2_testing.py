@@ -2,6 +2,15 @@
 import unittest
 import pytest
 import pandas as pd
+ 
+from evidently.pipeline.column_mapping import ColumnMapping
+ 
+from evidently.report import Report
+from evidently.metric_preset import DataDrift, NumTargetDrift
+ 
+from evidently.test_suite import TestSuite
+from evidently.test_preset import DataQuality, DataStability
+from evidently.tests import *
 
 path_processed = "/home/cdsw/data/pump_processed.csv"
         
@@ -31,22 +40,13 @@ test_min_max_s4(data.sensor_04)
 test_target(data.machine_status)
 
 
-"""
-def test_loss():
-  
-  in_tensor = tf.placeholder(tf.float32, (None, 3))
-  
-  labels = tf.placeholder(tf.int32, None, 1))
-  
-  model = Model(in_tensor, labels)
-  
-  sess = tf.Session()
-  loss = sess.run(model.loss, feed_dict={
-    in_tensor:np.ones(1, 3),
-    labels:[[1]]
-  })
-  
-  assert loss != 0
-"""
+## Data Drift test
+reference = data.sample(n=5000, replace=False)
+current = data.sample(n=5000, replace=False)
+
+data_stability = TestSuite(tests=[
+    DataStability(),
+])
+data_stability.run(reference_data=reference, current_data=current)
   
   
