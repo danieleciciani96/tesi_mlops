@@ -4,7 +4,7 @@ import pytest
 import pandas as pd
  
 from evidently.pipeline.column_mapping import ColumnMapping
- 
+
 from evidently.report import Report
 from evidently.metric_preset import DataDrift, NumTargetDrift
  

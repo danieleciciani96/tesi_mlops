@@ -21,7 +21,8 @@ spark = SparkSession.builder\
   .getOrCreate()
 
 # get a snapshot_id from outside
-snapshot_id = sys.argv[1]
+snapshot_id = sys.argv[1] if len(sys.argv) > 1 else None
+
 
 if len(sys.argv) > 1:
     df_raw = spark.read\
@@ -51,7 +52,7 @@ print(df.groupBy('machine_status').count().orderBy('count').show())
 df = df.na.fill(value=-1)
 
 # Select only the relevant Feature
-final_sensors = ['sensor_00','sensor_02', 'sensor_04', 'sensor_06',  'sensor_07', 'sensor_08',
+final_sensors = ['timestamp', 'sensor_00','sensor_02', 'sensor_04', 'sensor_06',  'sensor_07', 'sensor_08',
                  'sensor_09', 'sensor_10', 'sensor_11', 'sensor_51', 'machine_status']
 
 

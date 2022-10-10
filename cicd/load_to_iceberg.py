@@ -18,11 +18,8 @@ spark = SparkSession.builder\
 
 ## Load data to Iceberg
 df = spark.read.format('csv').options(header='true', inferSchema='true').load('s3a://ps-uat2/user/dciciani/pump_sensor.csv')
-#df.show(1)
-
 
 spark.sql("DROP TABLE IF EXISTS spark_catalog.default.pump_raw")
 df.writeTo("spark_catalog.default.pump_raw").using("iceberg").create()
-
 
 spark.stop()

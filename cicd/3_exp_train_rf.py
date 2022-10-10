@@ -75,6 +75,8 @@ if __name__ == "__main__":
           .getOrCreate()
        
         data = spark.sql("SELECT * FROM spark_catalog.default.pump_processed").toPandas()
+
+        data.drop("timestamp", axis=1, inplace=True)
         
         raw_snapshot_id = sys.argv[1]
 
@@ -102,6 +104,12 @@ if __name__ == "__main__":
         
         # log runtime name & version for Reproducibility of the moduel
         mlflow.log_param("runtime_name", sys.argv[3] ) # cml runtime name
+        
+        """
+        train_dataPoints = 130000 
+        train = data[:train_dataPoints]
+        test = data[train_dataPoints:]
+        """
         
         # Split the data into training and test sets. (0.75, 0.25) split.
         train, test = train_test_split(data)
