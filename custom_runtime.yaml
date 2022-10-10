@@ -5,7 +5,7 @@ FROM docker.repository.cloudera.com/cloudera/cdsw/ml-runtime-jupyterlab-python3.
 RUN apt-get update && apt-get upgrade -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install the python package sklearn
-RUN pip install --no-cache-dir sklearn matplotlib pandas pyyaml numpy petastorm seaborn handyspark pyspark==3.2.0 dvc dvc[s3] xgboost shap tensorflow evidently pytest git+https://github.com/fastforwardlabs/cmlbootstrap#egg=cmlbootstrap
+RUN pip install --no-cache-dir sklearn matplotlib pandas pyyaml numpy petastorm seaborn handyspark pyspark==3.2.0 dvc dvc[s3] xgboost shap tensorflow evidently pytest git+https://github.com/fastforwardlabs/cmlbootstrap#egg=cmlbootstrap flask
 
 # Override Runtime label and environment variables metadata
 ENV ML_RUNTIME_EDITION="MlOps Runtime" \
