@@ -45,7 +45,9 @@ cde job create --type airflow \
                --dag-file mlops_airflow_dag.py \
                --mount-1-resource file-res-mlops \
                --name cicd_pipeline_mlops
-               
+
+# Execute the pipeline
+cde job run --name cicd_pipeline_mlops
                
 ### Recover a previous version
 cde resource upload --name file-res-mlops --local-path cde_jobs/mlops_airflow_dag_recover.py

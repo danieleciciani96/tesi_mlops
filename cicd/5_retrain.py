@@ -27,8 +27,8 @@ df = pd.read_csv(path_processed)
 df['target'] = df['machine_status']
 df = df.drop(["machine_status"], axis=1)
 
-from_period = "2018-08-01 00:00:00"
-#filter_period = sys.argv[1] if len(sys.argv) > 1 else None
+#from_period = "2018-08-01 00:00:00"
+from_period = sys.argv[1] if len(sys.argv) > 1 else "2018-06-30 06:40:00"
 
 
 

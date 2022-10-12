@@ -1,0 +1,10 @@
+pump-model-rf-v2.6:                            
+  hive_table_qualified_names:             
+    - "default.pump_raw@cm"                  
+    - "default.pump_processed@cm"
+    
+  metadata:                                                                     
+    f1-score: 0.99
+    n_estimators: 3
+    max_dept: 10
+    training_file: "cicd/exp_train_rf_.py"

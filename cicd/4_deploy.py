@@ -20,7 +20,7 @@ project_id = os.environ["CDSW_PROJECT_ID"]
 
 # Would be nice to name it with job id rather than session id
 modelReq = cmlapi.CreateModelRequest(
-    name = "pump-model-rf-v2.3",
+    name = "pump-model-rf-v2.6",
     description = "Pump predictive mainten Model",
     project_id = project_id,
     disable_authentication = True

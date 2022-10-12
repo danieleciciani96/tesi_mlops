@@ -37,6 +37,11 @@ Args
 - sys.argv[5] --> max_depth
 """
 
+raw_snapshot_id = sys.argv[1] if len(sys.argv) > 1 else "last"
+commit_id = sys.argv[2] if len(sys.argv) > 1 else "last"
+runtime_name = sys.argv[3] if len(sys.argv) > 1 else "danicicio/mlops-runtime:1.0.0"
+
+
 mlflow.set_experiment("rf_scores")
 
 def eval_metrics(actual, pred):
@@ -78,8 +83,6 @@ if __name__ == "__main__":
 
         data.drop("timestamp", axis=1, inplace=True)
         
-        raw_snapshot_id = sys.argv[1]
-
         # get the current Iceberg snapshot_id of pump_raw data
         if raw_snapshot_id == "last" :
             raw_snapshot_id = spark.read.format("iceberg")\
@@ -97,13 +100,14 @@ if __name__ == "__main__":
         mlflow.log_param("table_name", "pump_processed")
         mlflow.log_param("input_rows", data.shape[0]) 
         mlflow.log_param("input_cols", data.shape[1] -1 )
-
+        print("####")
+        print(raw_snapshot_id)
         # log snapshot id, git commit id for Reproducibility of the moduel
         mlflow.log_param("raw_snapshot_id", raw_snapshot_id )
-        mlflow.log_param("commit_id", sys.argv[2] ) # get git commit_id  "git log --format="%H" -n 1"
+        mlflow.log_param("commit_id", commit_id ) # get git commit_id  "git log --format="%H" -n 1"
         
         # log runtime name & version for Reproducibility of the moduel
-        mlflow.log_param("runtime_name", sys.argv[3] ) # cml runtime name
+        mlflow.log_param("runtime_name", runtime_name ) # cml runtime name
         
         """
         train_dataPoints = 130000 
@@ -152,7 +156,7 @@ if __name__ == "__main__":
         f1 = eval_metrics(test_y, pred)
 
         print("Random Forrest (n_estimators=%f, max_depth=%f):" % (n_estimators, max_depth))
-        print("  F1 Score: %s" % f1)
+        print("F1 Score: %s" % f1)
 
         #Log params
         mlflow.log_param("n_estimators", n_estimators)

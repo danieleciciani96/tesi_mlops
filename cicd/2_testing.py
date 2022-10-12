@@ -12,14 +12,17 @@ from evidently.test_suite import TestSuite
 from evidently.test_preset import DataQuality, DataStability
 from evidently.tests import *
 
+
+
 path_processed = "/home/cdsw/data/pump_processed.csv"
-        
 data = pd.read_csv(path_processed)
 #data.drop("Unnamed: 0", axis=1, inplace=True)
 
+print(data.head())
+    
 def test_n_columns(data):
     n_cols = data.shape[1]
-    assert n_cols == 11
+    assert n_cols == 12
     
     
 def test_min_max_s4(s4):
@@ -38,15 +41,3 @@ def test_target(target):
 test_n_columns(data)
 test_min_max_s4(data.sensor_04)
 test_target(data.machine_status)
-
-
-## Data Drift test
-reference = data.sample(n=5000, replace=False)
-current = data.sample(n=5000, replace=False)
-
-data_stability = TestSuite(tests=[
-    DataStability(),
-])
-data_stability.run(reference_data=reference, current_data=current)
-  
-  
